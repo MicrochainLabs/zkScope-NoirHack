@@ -1,0 +1,7 @@
+[package]
+name = "session_keys_demo"
+type = "bin"
+authors = [""]
+
+[dependencies]
+zkScope = { path = "../zkScope_lib" }
