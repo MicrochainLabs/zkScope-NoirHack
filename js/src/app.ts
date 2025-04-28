@@ -1,6 +1,5 @@
 import { UltraHonkBackend } from "@aztec/bb.js"
 import { Noir } from "@noir-lang/noir_js";
-//import circuit from "../add_spending_permission_notes/target/age_verifier.json" with { type: "json" };
 import circuit from './add_spending_permission_notes.json';
 
 import { IMT } from "@zk-kit/imt"
@@ -59,6 +58,12 @@ const newSpendingPermissionNotes = [
     }
 ]
 
+const oldStateTree01 = poseidon2([BigInt(accountIdentifier), BigInt(nonce)]);
+const oldStateTree23 = poseidon2([noteCommitmentsTree.root, 0]);
+const oldStateToot = poseidon2([oldStateTree01, oldStateTree23]);
+console.log("old state tree root: ", toHex(oldStateToot));
+
+
 for(let note of newSpendingPermissionNotes){
 
     noteCommitmentsTree.insert(BigInt("0x0"));
@@ -72,6 +77,11 @@ for(let note of newSpendingPermissionNotes){
     noteCommitmentsTree.update(nonce, noteCommitment);
     nonce++;
 }
+
+const newStateTree01 = poseidon2([BigInt(accountIdentifier), BigInt(nonce)]);
+const newStateTree23 = poseidon2([noteCommitmentsTree.root, 0]);
+const newStateToot = poseidon2([newStateTree01, newStateTree23]);
+console.log("new state tree root: ", toHex(newStateToot));
 
 inputs.note_commitments_new_root = toHex(noteCommitmentsTree.root) ;
 
