@@ -1,7 +1,7 @@
 # zkScope-NoirHack
 
 
-##Introduction 
+## Introduction 
 
 A Noir library for the account abstraction ecosystem.
 
@@ -9,22 +9,21 @@ It enables a trust-minimized off-chain framework that secures and governs an acc
 
 At the hackathon, we're developing Noir circuits to secure and manage, and control the on-chain behavior of smart accounts.
 
-##Organization
+## Organization
 circuits, contracts, js
-##Library
+## Library
 Contract and value whitelist
-##Demo
 
-##Architecture
+## Architecture
 State into merkle tree
 
 ZK circuits that read state and compute(Business logic an on-chain behavior)
 
 Framework - zk-kit
 
-##Integration
+## Integration
 Safe account, smart session module, etc
-##use case
-##Demo
+## Ise case
+## Demo
 
 
