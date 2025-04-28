@@ -19,27 +19,6 @@ type Address = [u8; 20];
 type Signature = [u8; 64];
 type Hash = [u8; 32];
 
-fn hash_values(leaves: [Field; 2]) -> Field {
-    let hash = poseidon2(leaves);
-    hash
-}
-
-fn merkle_tree_root<let DEPTH: u32>(leaf: Field, path_indices: Field, siblings: ([Field; DEPTH])) -> Field {
-    //let index_bits = path_indices.to_be_bits(N);
-    let index_bits:[u1; DEPTH] = path_indices.to_le_bits(); 
-    let mut current = leaf;
-    for i in 0..DEPTH {
-        let path_bit = index_bits[i] as bool;
-        let (hash_left, hash_right) = if path_bit {
-            (siblings[i], current)
-        } else {
-            (current, siblings[i])
-        };
-        current = hash_values([hash_left, hash_right]);
-    }
-    current
-}
-
 // compute note commitment
 pub fn compute_note_commitment(spender: Field, nonce: Field, token: Field, allowance: Field) -> Field{
     let hash = poseidon4([spender, nonce, token, allowance]);
@@ -64,62 +43,41 @@ pub fn addNewNotes <let DEPTH: u32, let NOTE_NB: u32>(
     let old_state_root = poseidon2([old_state_tree01, old_state_tree23]);
 
     let mut current_root = note_commitments_old_root;
-    let mut previous_nonce = nonce - 1;
     let mut current_nonce = nonce;
     
     for i in 0..NOTE_NB {
         
-        //if token or allowance or spender ==0
-        //let path_bits:[u1; DEPTH] = previous_nonce.to_le_bits();  // Little-endian conversion
-        let path_bits:[u1; DEPTH] = previous_nonce.to_be_bits(); // Big-endian alternative
-        
-        // Verify old root contains default_leaf
-        let computed_old_root = binary_merkle_root(
-            poseidon2,
-            default_leaf,
-            DEPTH,
-            path_bits,
-            siblings[i]
-        );
-        let computed_old_root1 = merkle_tree_root(
-            default_leaf,
-            previous_nonce,
-            siblings[i]
-        );
-       /* println(previous_nonce);
-        println(current_nonce);
-        println(default_leaf);
-        println(computed_old_root);
-        println(path_bits);
-        println(siblings[i]);
-        println(computed_old_root1);*/
-        println(previous_nonce);
-        println(default_leaf);
-        println(path_bits);
-        println(siblings[i]);
-        println(computed_old_root);
-         println(computed_old_root1);
-        println(current_root);
+        //if(new_notes_spender[i] != 0 && new_notes_token[i] != 0 && new_notes_allowance[i] !=0){
 
-        assert(computed_old_root == current_root);
-        
-        // Compute new root
-        let note_commitment = compute_note_commitment(
-            new_notes_spender[i],
-            current_nonce,
-            new_notes_token[i],
-            new_notes_allowance[i]
-        );
-        current_root = binary_merkle_root(
-            poseidon2,
-            note_commitment,
-            DEPTH,
-            path_bits,
-            siblings[i]
-        );
+            let path_bits:[u1; DEPTH] = current_nonce.to_le_bits(); 
+            
+            // Verify old root contains default_leaf
+            let computed_old_root = binary_merkle_root(
+                poseidon2,
+                default_leaf,
+                DEPTH,
+                path_bits,
+                siblings[i]
+            );
+            assert(computed_old_root == current_root);
+            
+            // Compute new root
+            let note_commitment = compute_note_commitment(
+                new_notes_spender[i],
+                current_nonce,
+                new_notes_token[i],
+                new_notes_allowance[i]
+            );
+            current_root = binary_merkle_root(
+                poseidon2,
+                note_commitment,
+                DEPTH,
+                path_bits,
+                siblings[i]
+            );
 
-        previous_nonce = previous_nonce + 1;
-        current_nonce = current_nonce + 1;
+            current_nonce = current_nonce + 1;
+        //}
     }
     assert (current_root == note_commitments_new_root);
 
