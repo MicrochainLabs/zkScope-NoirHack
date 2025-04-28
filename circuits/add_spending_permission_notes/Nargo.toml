@@ -1,0 +1,7 @@
+[package]
+name = "add_spending_permission_notes"
+type = "bin"
+authors = [""]
+
+[dependencies]
+zkScope = { path = "../zkScope_lib" }

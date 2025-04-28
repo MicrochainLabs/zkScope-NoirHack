@@ -3,14 +3,14 @@ use binary_merkle_root::binary_merkle_root;
 use std::hash::poseidon::bn254::hash_2 as poseidon2;
 use std::hash::poseidon::bn254::hash_4 as poseidon4;
 
-struct SpendingPermissionNote {
+pub struct SpendingPermissionNote {
     spender: Field, //signer
     token: Field,
     allowance: Field,
     nonce: Field,
 }
 
-struct  PubKey {
+pub struct  PubKey {
     x: [u8; 32],
     y: [u8; 32],
 }
@@ -19,6 +19,27 @@ type Address = [u8; 20];
 type Signature = [u8; 64];
 type Hash = [u8; 32];
 
+fn hash_values(leaves: [Field; 2]) -> Field {
+    let hash = poseidon2(leaves);
+    hash
+}
+
+fn merkle_tree_root<let DEPTH: u32>(leaf: Field, path_indices: Field, siblings: ([Field; DEPTH])) -> Field {
+    //let index_bits = path_indices.to_be_bits(N);
+    let index_bits:[u1; DEPTH] = path_indices.to_le_bits(); 
+    let mut current = leaf;
+    for i in 0..DEPTH {
+        let path_bit = index_bits[i] as bool;
+        let (hash_left, hash_right) = if path_bit {
+            (siblings[i], current)
+        } else {
+            (current, siblings[i])
+        };
+        current = hash_values([hash_left, hash_right]);
+    }
+    current
+}
+
 // compute note commitment
 pub fn compute_note_commitment(spender: Field, nonce: Field, token: Field, allowance: Field) -> Field{
     let hash = poseidon4([spender, nonce, token, allowance]);
@@ -26,31 +47,31 @@ pub fn compute_note_commitment(spender: Field, nonce: Field, token: Field, allow
 }
 
 
-fn addNewNotes <let DEPTH: u32, let NOTE_NB: u32>(
-    // Public inputs
+pub fn addNewNotes <let DEPTH: u32, let NOTE_NB: u32>(
+    smart_account: Field, 
+    nonce: Field,
     note_commitments_old_root: Field,
     note_commitments_new_root: Field,
     default_leaf: Field,
-    smart_account: Field, 
-    nonce: Field,
-    // Private inputs
-    new_notes: [SpendingPermissionNote; NOTE_NB],
+    new_notes_spender: [Field; NOTE_NB],
+    new_notes_token: [Field; NOTE_NB],
+    new_notes_allowance: [Field; NOTE_NB],
     siblings: [[Field; DEPTH]; NOTE_NB],
 ) -> (Field, Field) {
-
-    let mut current_root = note_commitments_old_root;
-    let mut current_nonce = nonce;
 
     let old_state_tree01 = poseidon2([smart_account, nonce]);
     let old_state_tree23 = poseidon2([note_commitments_old_root, 0]);
     let old_state_root = poseidon2([old_state_tree01, old_state_tree23]);
+
+    let mut current_root = note_commitments_old_root;
+    let mut previous_nonce = nonce - 1;
+    let mut current_nonce = nonce;
     
     for i in 0..NOTE_NB {
-       
-        let index = current_nonce + 1;
         
-        let path_bits:[u1; DEPTH] = index.to_le_bits();  // Little-endian conversion
-        // let path_bits = index.to_be_bits(TreeLevels); // Big-endian alternative
+        //if token or allowance or spender ==0
+        //let path_bits:[u1; DEPTH] = previous_nonce.to_le_bits();  // Little-endian conversion
+        let path_bits:[u1; DEPTH] = previous_nonce.to_be_bits(); // Big-endian alternative
         
         // Verify old root contains default_leaf
         let computed_old_root = binary_merkle_root(
@@ -60,14 +81,34 @@ fn addNewNotes <let DEPTH: u32, let NOTE_NB: u32>(
             path_bits,
             siblings[i]
         );
+        let computed_old_root1 = merkle_tree_root(
+            default_leaf,
+            previous_nonce,
+            siblings[i]
+        );
+       /* println(previous_nonce);
+        println(current_nonce);
+        println(default_leaf);
+        println(computed_old_root);
+        println(path_bits);
+        println(siblings[i]);
+        println(computed_old_root1);*/
+        println(previous_nonce);
+        println(default_leaf);
+        println(path_bits);
+        println(siblings[i]);
+        println(computed_old_root);
+         println(computed_old_root1);
+        println(current_root);
+
         assert(computed_old_root == current_root);
         
         // Compute new root
         let note_commitment = compute_note_commitment(
-            new_notes[i].spender,
-            index,
-            new_notes[i].token,
-            new_notes[i].allowance
+            new_notes_spender[i],
+            current_nonce,
+            new_notes_token[i],
+            new_notes_allowance[i]
         );
         current_root = binary_merkle_root(
             poseidon2,
@@ -76,10 +117,13 @@ fn addNewNotes <let DEPTH: u32, let NOTE_NB: u32>(
             path_bits,
             siblings[i]
         );
+
+        previous_nonce = previous_nonce + 1;
+        current_nonce = current_nonce + 1;
     }
     assert (current_root == note_commitments_new_root);
 
-    let new_state_tree01 = poseidon2([smart_account, current_root]);
+    let new_state_tree01 = poseidon2([smart_account, current_nonce]);
     let new_state_tree23 = poseidon2([note_commitments_new_root, 0]);
     let new_state_root = poseidon2([new_state_tree01, new_state_tree23]);
 
@@ -103,10 +147,12 @@ fn revokeNotes <let DEPTH: u32, let NOTE_NB: u32>(
     //compute global state tree root/assert
     //compute new commitment state tree root
     //compute new global state tree root
+
+    // or just add a nullifier of the revoked notes on-chain by the note issuer
 }
 
 
-fn validate_spend_permission_note <let DEPTH: u32, let STATE_TREE_DEPTH: u32>(
+pub fn validate_spend_permission_note <let DEPTH: u32, let STATE_TREE_DEPTH: u32>(
     smart_account: Field, 
     signer: PubKey,
     signature: Signature,

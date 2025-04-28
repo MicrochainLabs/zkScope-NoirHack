@@ -1,0 +1,6 @@
+[package]
+name = "spending_permission_note"
+type = "bin"
+authors = [""]
+
+[dependencies]
