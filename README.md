@@ -23,11 +23,11 @@ project-root/
 
 - **circuits/** — Zero-knowledge circuits written in Noir.
   - **zkScope_lib/** — Reusable components and utility circuits:
-    - `contract_value_whitelist.nr`: [A circuit that verifies whether a smart account interaction targets an approved contract address and transfers value (native or ERC-20) to an approved recipient address: Done]
-    - `gas_usage.nr`: [A circuit that governs the gas usage behavior of a smart account: In progress]
+    - `contract_value_whitelist.nr`: [A circuit that verifies whether a smart account interaction targets an approved contract address and transfers value (native or ERC-20) to an approved recipient address]
+    - `gas_usage.nr`: [A circuit that governs the gas usage behavior of a smart account]
     - `utils.nr`: Helper functions for other circuits
   - `session_keys_demo`: [A main circuit leveraging zkScope_lib within a session key use case]
-  - `spending_permission_note | add_spending_permission_notes`: [Main circuits: enable a smart account to define off-chain permission notes that authorize an app, trading bot, or AI agent to spend ERC-20 tokens on the user's behalf: In progress]
+  - `spending_permission_note | add_spending_permission_notes`: [Main circuits: enable a smart account to define off-chain permission notes that authorize an app, trading bot, or AI agent to spend ERC-20 tokens on the user's behalf]
 
 ## A new paradigm for validating transactions/user operations by the Blockchain
 We’re familiar with validating transactions/user operations based on different types of signers and signing algorithms, such as  ECDSA, Passkey (WebAuthn), and multisig. Today, most accounts, including externally owned accounts(EOAs) and smart accounts, are controlled via signers. So, the Blockchain is configured to only trust the signer: it will validate and accept a transaction based on providing a valid signature.
