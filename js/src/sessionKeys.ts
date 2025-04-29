@@ -7,13 +7,20 @@ import { poseidon2 } from "poseidon-lite"
 import { parseEther, toHex } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { hexlify } from "ethers";
+import { LeanIMT } from "@zk-kit/lean-imt";
 
 
 
+// Hash function used to compute the tree nodes.
+const hash = (a: string | number | bigint, b: string | number | bigint) => poseidon2([a, b])
+
+function padArray(arr: any[], length: number, fill: any = 0) {
+  return arr.concat(Array(length - arr.length).fill(fill));
+}
 
 async function  main(){
 
-const depth = 17
+const depth = 10
 const zeroValue = 0
 const arity = 2
 
@@ -24,12 +31,14 @@ const sessionStateTree = new IMT(poseidon2, 2, zeroValue, arity);
 const sessionAllowedSmartContracts: string[] = ["0x337Df693AE75a0ff64317A77dAC8886F61455b85", "0x2CA1d854C83997d56263Bf560A2D198911383b2b", "0x94D869Ed79067747Be5f160a9566CC79DDc28C3E"] 
 const accountAllowedToAddressesTree: string[] = ["0xbd8faF57134f9C5584da070cC0be7CA8b5A24953", "0xb9890DC58a1A1a9264cc0E3542093Ee0A1780822", "0x45B52500cb12Ae6046D8566598aB9ccFa7B21aD7"]
 
-const smartContractCallsWhitelistTree = new IMT(poseidon2, depth, zeroValue, arity);
+//const smartContractCallsWhitelistTree = new IMT(poseidon2, depth, zeroValue, arity);
+const smartContractCallsWhitelistTree = new LeanIMT(hash)
 for (let address of sessionAllowedSmartContracts) {
     await smartContractCallsWhitelistTree.insert(BigInt(address));
 }
 
-const valueTransferWhitelistTree = new IMT(poseidon2, depth, zeroValue, arity);
+//const valueTransferWhitelistTree = new IMT(poseidon2, depth, zeroValue, arity);
+const valueTransferWhitelistTree = new LeanIMT(hash)
 for (let address of accountAllowedToAddressesTree) {
     await valueTransferWhitelistTree.insert(BigInt(address));
 }
@@ -71,11 +80,14 @@ const circuitInputs = {
     function_selector: [] as string[], 
     erc20_transfer_to:[] as string[], 
     native_coin_transfer_siblings: [] as string[][], 
-    native_coin_transfer_path_indices: [] as string[],     
+    native_coin_transfer_path_indices: [] as string[][],  
+    native_coin_transfer_merkle_proof_length: 0,   
     smart_contract_call_siblings: [] as string[][],
-    smart_contract_call_path_indices: [] as string[],
+    smart_contract_call_path_indices: [] as string[][],
+    smart_contract_call_merkle_proof_length: 0,
     erc20_transfer_siblings: [] as string[][],
-    erc20_transfer_path_indices: [] as string[] 
+    erc20_transfer_path_indices: [] as string[][],
+    erc20_transfer_merkle_proof_length: 0 
 }
 
 for(let tx of transactions){
@@ -86,34 +98,49 @@ for(let tx of transactions){
     circuitInputs.erc20_transfer_to.push(toHex(tx.Erc20TransferTo))
     if(tx.value != BigInt(0)){
       const index= await valueTransferWhitelistTree.indexOf(BigInt(tx.dest));
-      const allowedToProof= await valueTransferWhitelistTree.createProof(index);
-      circuitInputs.native_coin_transfer_siblings.push(allowedToProof.siblings.map(v => toHex(v[0])))
-      circuitInputs.native_coin_transfer_path_indices.push(toHex(Number("0b" + allowedToProof.pathIndices.join(""))))
+      const allowedToProof= await valueTransferWhitelistTree.generateProof(index);
+      circuitInputs.native_coin_transfer_siblings.push(padArray(allowedToProof.siblings.map(v => toHex(v)), depth, "0x0"))
+      circuitInputs.native_coin_transfer_merkle_proof_length = allowedToProof.siblings.length;
+      const merkleProofIndices = []
+      for (let i = 0; i < depth; i += 1) {
+        merkleProofIndices.push((allowedToProof.index >> i) & 1)
+      }
+      circuitInputs.native_coin_transfer_path_indices.push(merkleProofIndices.map(v => toHex(v)))
     }else{
       //static value
-      circuitInputs.native_coin_transfer_siblings.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
-      circuitInputs.native_coin_transfer_path_indices.push("0x0")
+      circuitInputs.native_coin_transfer_siblings.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
+      circuitInputs.native_coin_transfer_path_indices.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
     }
 
     if(tx.functionSelector != BigInt("0x0")){
       const index= await smartContractCallsWhitelistTree.indexOf(BigInt(tx.dest));
-      const allowedSmartContractProof= await smartContractCallsWhitelistTree.createProof(index);
-      circuitInputs.smart_contract_call_siblings.push(allowedSmartContractProof.siblings.map(v => toHex(v[0])))
-      circuitInputs.smart_contract_call_path_indices.push(toHex(Number("0b" + allowedSmartContractProof.pathIndices.join(""))))
+      const allowedSmartContractProof= await smartContractCallsWhitelistTree.generateProof(index);
+      circuitInputs.smart_contract_call_siblings.push(padArray(allowedSmartContractProof.siblings.map(v => toHex(v)), depth, "0x0"))
+      circuitInputs.smart_contract_call_merkle_proof_length = allowedSmartContractProof.siblings.length;
+      const merkleProofIndices = []
+      for (let i = 0; i < depth; i += 1) {
+        merkleProofIndices.push((allowedSmartContractProof.index >> i) & 1)
+      }
+      circuitInputs.smart_contract_call_path_indices.push(merkleProofIndices.map(v => toHex(v)))
     }else{
       //static value
-      circuitInputs.smart_contract_call_siblings.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
-      circuitInputs.smart_contract_call_path_indices.push("0x0")
+      circuitInputs.smart_contract_call_siblings.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
+      circuitInputs.smart_contract_call_path_indices.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
     }
     if(tx.Erc20TransferTo != BigInt("0x0")){
       const index= await valueTransferWhitelistTree.indexOf(BigInt(tx.Erc20TransferTo));
-      const allowedSmartContractProof= await valueTransferWhitelistTree.createProof(index);
-      circuitInputs.erc20_transfer_siblings.push(allowedSmartContractProof.siblings.map(v => toHex(v[0])))
-      circuitInputs.erc20_transfer_path_indices.push(toHex(Number("0b" + allowedSmartContractProof.pathIndices.join(""))))
+      const allowedSmartContractProof= await valueTransferWhitelistTree.generateProof(index);
+      circuitInputs.erc20_transfer_siblings.push(padArray(allowedSmartContractProof.siblings.map(v => toHex(v)), depth, "0x0"))
+      circuitInputs.erc20_transfer_merkle_proof_length = allowedSmartContractProof.siblings.length;
+      const merkleProofIndices = []
+      for (let i = 0; i < depth; i += 1) {
+        merkleProofIndices.push((allowedSmartContractProof.index >> i) & 1)
+      }
+      circuitInputs.erc20_transfer_path_indices.push(merkleProofIndices.map(v => toHex(v)))
     }else{
       //static value
-      circuitInputs.erc20_transfer_siblings.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
-      circuitInputs.erc20_transfer_path_indices.push("0x0")
+      circuitInputs.erc20_transfer_siblings.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
+      circuitInputs.erc20_transfer_path_indices.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
     }
 }
 
