@@ -24,7 +24,7 @@ project-root/
 - **circuits/** — Zero-knowledge circuits written in Noir.
   - **zkScope_lib/** — Reusable components and utility circuits:
     - `contract_value_whitelist.nr`: [A circuit that verifies whether a smart account interaction targets an approved contract address and transfers value (native or ERC-20) to an approved recipient address: Done]
-    - `gas_usage.nr`: [A circuit that govern the gas usage behavior of a smart account: In progress]
+    - `gas_usage.nr`: [A circuit that governs the gas usage behavior of a smart account: In progress]
     - `utils.nr`: Helper functions for other circuits
   - `session_keys_demo`: [A main circuit leveraging zkScope_lib within a session key use case]
   - `spending_permission_note | add_spending_permission_notes`: [Main circuits: enable a smart account to define off-chain permission notes that authorize an app, trading bot, or AI agent to spend ERC-20 tokens on the user's behalf: In progress]
@@ -39,7 +39,7 @@ We’re introducing a new approach to control an account using a signer and the 
 All wallets rely on public-key cryptography, which provides cryptographic services over data—this is a form of purpose-specific cryptography. In recent years, we've entered a new era: cryptographic services over computation, also known as general-purpose or programmable cryptography, have emerged—driven especially by zero-knowledge proofs (ZKPs) and fully homomorphic encryption (FHE). As account abstraction (AA) evolves, wallets will increasingly integrate programmable cryptography as a native capability.
 ![Demo Screenshot](images/signer-and-on-chain-behavior.png) 
 
-## ZK Apps for smart accounts design
+## ZK Apps for smart accounts
 
 For any feature around securing and controlling the account's on-chain behavior:
 * Define and put the state into a Merkle tree
