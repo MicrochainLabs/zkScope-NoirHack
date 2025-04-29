@@ -2,7 +2,7 @@ use zkScope::contract_value_whitelist::validate_user_op;
 use zkScope::utilis::user_op_hasher;
 
 
-global MAX_DEPTH: u32 = 17; 
+global MAX_DEPTH: u32 = 10; 
 global TX_NB: u32 = 1;
 
 fn main(
@@ -15,16 +15,16 @@ fn main(
     value: pub [Field; TX_NB], 
     function_selector: pub [Field; TX_NB], 
     erc20_transfer_to: pub [Field; TX_NB],
-    native_coin_transfer_siblings: [[Field; MAX_DEPTH]; TX_NB],  native_coin_transfer_path_indices: [Field; TX_NB],
-    smart_contract_call_siblings: [[Field; MAX_DEPTH]; TX_NB], smart_contract_call_path_indices: [Field; TX_NB],
-    erc20_transfer_siblings: [[Field; MAX_DEPTH]; TX_NB], erc20_transfer_path_indices: [Field; TX_NB],
+    native_coin_transfer_siblings: [[Field; MAX_DEPTH]; TX_NB],  native_coin_transfer_path_indices: [[u1; MAX_DEPTH]; TX_NB], native_coin_transfer_merkle_proof_length: u32,
+    smart_contract_call_siblings: [[Field; MAX_DEPTH]; TX_NB], smart_contract_call_path_indices: [[u1; MAX_DEPTH]; TX_NB], smart_contract_call_merkle_proof_length: u32,
+    erc20_transfer_siblings: [[Field; MAX_DEPTH]; TX_NB], erc20_transfer_path_indices: [[u1; MAX_DEPTH]; TX_NB], erc20_transfer_merkle_proof_length: u32
 )-> pub (Field, Field) {
 
     let state_root= validate_user_op(smart_account, session_id, contract_whitelist_root, value_whitelist_root,
         dest, value, function_selector, erc20_transfer_to,
-        native_coin_transfer_siblings, native_coin_transfer_path_indices,
-        smart_contract_call_siblings, smart_contract_call_path_indices,
-        erc20_transfer_siblings, erc20_transfer_path_indices);
+        native_coin_transfer_siblings, native_coin_transfer_path_indices, native_coin_transfer_merkle_proof_length,
+        smart_contract_call_siblings, smart_contract_call_path_indices, smart_contract_call_merkle_proof_length,
+        erc20_transfer_siblings, erc20_transfer_path_indices, erc20_transfer_merkle_proof_length);
 
     let op_hasher = user_op_hasher(smart_account + session_id, state_root, user_op_hash);
 
@@ -39,7 +39,7 @@ fn main(
 fn test_main() {
     //main(1, 2);
 
-    let smart_account = 0xb9890DC58a1A1a9264cc0E3542093Ee0A1780822;
+    /*let smart_account = 0xb9890DC58a1A1a9264cc0E3542093Ee0A1780822;
     let session_id = 0x0f6CDADB6A7519BfBCF493609d1fF88a07058Dd1;
     let contract_whitelist_root = 0xa8ce3b12072b6ac6f31bc26fa501b4a54cc2a56ec7b2e280e02db17101f4c27;
     let value_whitelist_root = 0x18a409e851a7400ce5aa0d3f428ec99a81f9f33e20d898a9826b8ea52d1b3801;
@@ -95,10 +95,10 @@ fn test_main() {
             0x2a7c7c9b6ce5880b9f6f228d72bf6a575a526f29c66ecceef8b753d38bba7323
         ]
     ];
-    let erc20_to_address_path_indices = [0x10000];
-    let out = main(smart_account, session_id, op, contract_whitelist_root, value_whitelist_root, 
+    let erc20_to_address_path_indices = [0x10000];*/
+    /*let out = main(smart_account, session_id, op, contract_whitelist_root, value_whitelist_root, 
     dest, value, function_selector, erc20_transfer_to, 
-    eth_to_siblings, eth_to_path_indices,
-    allowed_smart_contract_call_siblings, allowed_smart_contract_call_path_indices, erc20_to_address_siblings, erc20_to_address_path_indices);
-    println(out);
+    eth_to_siblings, eth_to_path_indices, 2,
+    allowed_smart_contract_call_siblings, allowed_smart_contract_call_path_indices, 2, erc20_to_address_siblings, erc20_to_address_path_indices, 2);
+    println(out);*/
 }
