@@ -2,3 +2,18 @@ target
 export
 gates_report.json
 node_modules
+# Compiler files
+cache/
+out/
+
+lib/
+broadcast/
+
+# Ignores development broadcast logs
+!/broadcast
+/broadcast/*/31337/
+/broadcast/**/dry-run/
+/broadcast
+
+# Dotenv file
+.env

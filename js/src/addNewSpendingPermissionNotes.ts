@@ -100,5 +100,5 @@ console.log("Proof: ", proof);
 
 }
 
-//npx ts-node src/app.ts
+//npx ts-node src/addNewSpendingPermissionNotes.ts
 main()

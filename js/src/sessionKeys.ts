@@ -1,0 +1,136 @@
+import { UltraHonkBackend } from "@aztec/bb.js"
+import { Noir } from "@noir-lang/noir_js";
+import circuit from './session_keys_demo.json';
+
+import { IMT } from "@zk-kit/imt"
+import { poseidon2 } from "poseidon-lite"
+import { parseEther, toHex } from "viem";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { hexlify } from "ethers";
+
+
+
+
+async function  main(){
+
+const depth = 17
+const zeroValue = 0
+const arity = 2
+
+const accountIdentifier = "0xb9890DC58a1A1a9264cc0E3542093Ee0A1780822";
+
+const sessionStateTree = new IMT(poseidon2, 2, zeroValue, arity);
+
+const sessionAllowedSmartContracts: string[] = ["0x337Df693AE75a0ff64317A77dAC8886F61455b85", "0x2CA1d854C83997d56263Bf560A2D198911383b2b", "0x94D869Ed79067747Be5f160a9566CC79DDc28C3E"] 
+const accountAllowedToAddressesTree: string[] = ["0xbd8faF57134f9C5584da070cC0be7CA8b5A24953", "0xb9890DC58a1A1a9264cc0E3542093Ee0A1780822", "0x45B52500cb12Ae6046D8566598aB9ccFa7B21aD7"]
+
+const smartContractCallsWhitelistTree = new IMT(poseidon2, depth, zeroValue, arity);
+for (let address of sessionAllowedSmartContracts) {
+    await smartContractCallsWhitelistTree.insert(BigInt(address));
+}
+
+const valueTransferWhitelistTree = new IMT(poseidon2, depth, zeroValue, arity);
+for (let address of accountAllowedToAddressesTree) {
+    await valueTransferWhitelistTree.insert(BigInt(address));
+}
+
+const sessionOwnerPrivateKey = generatePrivateKey()
+const sessionOwner = privateKeyToAccount(sessionOwnerPrivateKey)
+
+sessionStateTree.insert(BigInt(accountIdentifier))
+sessionStateTree.insert(BigInt(sessionOwner.address))
+sessionStateTree.insert(smartContractCallsWhitelistTree.root)
+sessionStateTree.insert(valueTransferWhitelistTree.root)
+console.log("session State Tree root: ", toHex(sessionStateTree.root));
+
+//const parsedAmountValue = parseEther("1")
+const transaction= {
+    dest: BigInt("0x337Df693AE75a0ff64317A77dAC8886F61455b85"),
+    value: BigInt("0x0"),
+    functionSelector: BigInt("0xa9059cbb"),
+    Erc20TransferTo: BigInt("0xb9890DC58a1A1a9264cc0E3542093Ee0A1780822")
+}
+
+const transactions = [
+      transaction
+]
+
+const SNARK_SCALAR_FIELD = BigInt("0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001");
+let userOpHash= "0x9a58fb6799b1e11cc129a14592f0a75a00970cf141e2abfbf76d070d4c01f893";
+let op = BigInt(hexlify(userOpHash));
+op %= SNARK_SCALAR_FIELD;
+
+const circuitInputs = {
+    smart_account: accountIdentifier,
+    session_id: sessionOwner.address,
+    user_op_hash: toHex(op),
+    contract_whitelist_root: toHex(smartContractCallsWhitelistTree.root),
+    value_whitelist_root: toHex(valueTransferWhitelistTree.root),
+    dest:[] as string[],
+    value: [] as string[],
+    function_selector: [] as string[], 
+    erc20_transfer_to:[] as string[], 
+    native_coin_transfer_siblings: [] as string[][], 
+    native_coin_transfer_path_indices: [] as string[],     
+    smart_contract_call_siblings: [] as string[][],
+    smart_contract_call_path_indices: [] as string[],
+    erc20_transfer_siblings: [] as string[][],
+    erc20_transfer_path_indices: [] as string[] 
+}
+
+for(let tx of transactions){
+    
+    circuitInputs.dest.push(toHex(tx.dest))
+    circuitInputs.value.push(toHex(tx.value))
+    circuitInputs.function_selector.push(toHex(tx.functionSelector))
+    circuitInputs.erc20_transfer_to.push(toHex(tx.Erc20TransferTo))
+    if(tx.value != BigInt(0)){
+      const index= await valueTransferWhitelistTree.indexOf(BigInt(tx.dest));
+      const allowedToProof= await valueTransferWhitelistTree.createProof(index);
+      circuitInputs.native_coin_transfer_siblings.push(allowedToProof.siblings.map(v => toHex(v[0])))
+      circuitInputs.native_coin_transfer_path_indices.push(toHex(Number("0b" + allowedToProof.pathIndices.join(""))))
+    }else{
+      //static value
+      circuitInputs.native_coin_transfer_siblings.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
+      circuitInputs.native_coin_transfer_path_indices.push("0x0")
+    }
+
+    if(tx.functionSelector != BigInt("0x0")){
+      const index= await smartContractCallsWhitelistTree.indexOf(BigInt(tx.dest));
+      const allowedSmartContractProof= await smartContractCallsWhitelistTree.createProof(index);
+      circuitInputs.smart_contract_call_siblings.push(allowedSmartContractProof.siblings.map(v => toHex(v[0])))
+      circuitInputs.smart_contract_call_path_indices.push(toHex(Number("0b" + allowedSmartContractProof.pathIndices.join(""))))
+    }else{
+      //static value
+      circuitInputs.smart_contract_call_siblings.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
+      circuitInputs.smart_contract_call_path_indices.push("0x0")
+    }
+    if(tx.Erc20TransferTo != BigInt("0x0")){
+      const index= await valueTransferWhitelistTree.indexOf(BigInt(tx.Erc20TransferTo));
+      const allowedSmartContractProof= await valueTransferWhitelistTree.createProof(index);
+      circuitInputs.erc20_transfer_siblings.push(allowedSmartContractProof.siblings.map(v => toHex(v[0])))
+      circuitInputs.erc20_transfer_path_indices.push(toHex(Number("0b" + allowedSmartContractProof.pathIndices.join(""))))
+    }else{
+      //static value
+      circuitInputs.erc20_transfer_siblings.push(["0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0", "0x0", "0x0", "0x0", "0x0","0x0", "0x0", "0x0"])
+      circuitInputs.erc20_transfer_path_indices.push("0x0")
+    }
+}
+
+//@ts-ignore
+const noir = new Noir(circuit);
+
+//@ts-ignore
+const { witness } = await noir.execute(circuitInputs);
+
+//@ts-ignore
+const backend = new UltraHonkBackend(circuit.bytecode);
+
+console.log("Proof Generation ...");
+const proof = await backend.generateProof(witness);
+console.log("Proof: ", proof);
+
+}
+
+//npx ts-node src/sessionKeys.ts
+main()
