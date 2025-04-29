@@ -13,9 +13,9 @@ Feel free to use this template as a starting point to create your own Noir libra
 
 ---
 
-# LIBRARY_NAME
+# zkScope
 
-Add a brief description of the library
+A Noir library for the account abstraction ecosystem.
 
 ## Noir version compatibility
 
