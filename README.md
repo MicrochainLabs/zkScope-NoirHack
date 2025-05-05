@@ -46,9 +46,13 @@ For any feature around securing and controlling the account's on-chain behavior:
 * Program the feature business logic using Noir circuit.
 ![Demo Screenshot](images/zk-scope-cryptography.png)
 
-general/session keys/spending permission notes for smart accounts
+On-chain behavior: smart contract call and exchange value
+![Demo Screenshot](images/on-chain-behavior-smart-contract-call-and-exchange-value.png)
 
-Framework - zk-kit
+
+On-chain behavior management within a smart account: 
+![Demo Screenshot](images/smart-account-zkp.png)
+
 
 ## Integration
 1) The Bybit attack is an alert for missing a strong security guarantee for smart accounts that hold an important amount of value.
