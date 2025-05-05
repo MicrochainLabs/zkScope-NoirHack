@@ -51,7 +51,10 @@ general/session keys/spending permission notes for smart accounts
 Framework - zk-kit
 
 ## Integration
-* Safe account(Bybit attack, this is how can we tell the blockchain that the transction that upgrade the code that control the account is malicious and unintended behavior)
+* Bybit attack is an alert for missing a strong security guarantee for smart accounts that hold an important amount of value.
+Using zkScope, we will add a new security layer to the existing Safe accounts that provide strong security guarantees around the accounts' on-chain behavior(technically, via safe handler).
+In general, it will be integrated into any smart accounts: ERC-4337/ERC-7579 compliant accounts and smart EOAs(EIP-7702).
+
 * Smart session module
 ## Use case
 ## Demo
