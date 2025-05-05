@@ -58,7 +58,7 @@ In general, it will be integrated into any smart accounts: ERC-4337/ERC-7579 com
 2) [Smart session](https://github.com/erc7579/smartsessions/tree/main): Session keys are scoped (i.e., restricted to certain on-chain actions), only valid for a pre-determined period, and authorized by the user. For example, a session key can be limited to only approve USDC transfers under a certain value to a whitelist of addresses for the next hour. They are a useful tool for making general UX improvements but can also unlock powerful new use cases that require delegating high-stakes access rights to a trusted entity like an AI agent or trading bot..
 For production, Smart Session is an ERC-7579 module created by Rhinestone and Biconomy. It only supports on-chain programmable permission. With zkScope, we will integrate off-chain programmable persimmon into the module. In the hackathon, we built a seamless on-chain experience with session keys using Noir.
 
-3) Spending permission notes for smart accounts: 
+3) Spending permission notes for smart accounts: enable apps, AI agents, or trading bots to spend native and ERC-20 tokens on behalf of users.
 
 ## Use case
 ## Demo
