@@ -55,7 +55,9 @@ Framework - zk-kit
 Using zkScope, we will add a new security layer to the existing Safe accounts that provide strong security guarantees around the accounts' on-chain behavior(technically, via safe handler).
 In general, it will be integrated into any smart accounts: ERC-4337/ERC-7579 compliant accounts and smart EOAs(EIP-7702).
 
-* Smart session module
+* Smart session: Session keys are scoped (i.e., restricted to certain on-chain actions), only valid for a pre-determined period, and authorized by the user. For example, a session key can be limited to only approve USDC transfers under a certain value to a whitelist of addresses for the next hour. They are a useful tool for making general UX improvements but can also unlock powerful new use cases that require delegating high-stakes access rights to a trusted entity like an AI agent or trading bot..
+For production, Smart Session is an ERC-7579 module created by Rhinestone and Biconomy. It only supports on-chain programmable permission. With zkScope, we will integrate off-chain programmable persimmon into the module. In the hackathon, we built a seamless on-chain experience with session keys using Noir.
+
 ## Use case
 ## Demo
 An end-to-end example of using Noir circuits to control the on-chain behavior of a smart account.
