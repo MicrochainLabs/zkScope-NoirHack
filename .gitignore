@@ -2,9 +2,14 @@ target
 export
 gates_report.json
 node_modules
+.next
 # Compiler files
 cache/
 out/
+
+**/.next/
+.next/
+
 
 lib/
 broadcast/
@@ -17,3 +22,5 @@ broadcast/
 
 # Dotenv file
 .env
+
+
