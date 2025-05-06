@@ -64,7 +64,8 @@ For production, Smart Session is an ERC-7579 module created by Rhinestone and Bi
 
 3) Spending permission notes for smart accounts: enable apps, AI agents, or trading bots to spend native and ERC-20 tokens on behalf of users.
 
-## Use case
+4) zkScope integration into diferent account abstraction(AA) ecosystem such as Starknet(Garaga SDK).
+
 ## Demo
 An end-to-end example of using Noir circuits to control the on-chain behavior of a smart account.
 
