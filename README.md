@@ -69,9 +69,18 @@ For production, Smart Session is an ERC-7579 module created by Rhinestone and Bi
 5) Smart accounts for enterprises and employees: Prove with ZK that an employee's transactions are compliant with the enterprise governance rules.
 
 ## Demo
-An end-to-end example of using Noir circuits to control the on-chain behavior of a smart account.
+The purpose of this demo is to showcase how zkScope is making the on-chain experience more user-friendly (web2-like experience). It is an end-to-end example of using Noir circuits to secure and control the on-chain behavior of a smart account via ZK-based session keys.
 
-Session keys: 
+Session keys are scoped (i.e., restricted to certain on-chain actions), only valid for a pre-determined period, and authorized by the user. For example, a session key can be limited to only approve USDC transfers under a certain value to a whitelist of addresses for the next hour. They are a useful tool for making general UX improvements.
 
-dApp: 
+dApp demo: a simple application for paying bills via stablecoins. We can use ZK-based session keys for any dApp.
 
+Set up:
+
+1) Clone the project and enter “session-keys-Demo-UI” folder
+2) yarn install
+3) Get your api key from: https://dashboard.pimlico.io/sign-in
+4) Add in .env file your pimlico api key: NEXT_PUBLIC_PIMLICO_API_KEY=your_api_key
+5) The demo is configured within the Polygon network. We must create three fake ERC20 tokens representing stablecoins: USDT, USDC, and DAI. You can use https://wizard.openzeppelin.com/#erc20 and remix to deploy them. 
+6) We need to set the fake ERC20 addresses in the project. In the file “components/constants.ts”, put the three deployed ERC20 addresses.
+7) yarn dev
