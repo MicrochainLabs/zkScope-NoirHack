@@ -95,3 +95,6 @@ https://github.com/user-attachments/assets/bf649e9a-c175-4ed8-a9dc-536037cfa4fe
 
 
 Bills payments:
+
+https://github.com/user-attachments/assets/e1b6c2d8-667a-4c2a-8e29-83215edaa23e
+
