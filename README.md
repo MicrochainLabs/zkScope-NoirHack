@@ -84,3 +84,10 @@ Set up:
 5) The demo is configured within the Polygon network. We must create three fake ERC20 tokens representing stablecoins: USDT, USDC, and DAI. You can use https://wizard.openzeppelin.com/#erc20 and remix to deploy them. 
 6) We need to set the fake ERC20 addresses in the project. In the file “components/constants.ts”, put the three deployed ERC20 addresses.
 7) yarn dev
+
+Create new smart account:
+
+Create new ZK-based smart session:
+<video src="https://www.youtube.com/watch?v=Kl0-SLvncks" controls width="500"></video>
+
+Bills payments:
