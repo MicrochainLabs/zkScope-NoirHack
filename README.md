@@ -100,4 +100,4 @@ https://github.com/user-attachments/assets/e1b6c2d8-667a-4c2a-8e29-83215edaa23e
 
 Web1 vs. Web2 vs. Web3 Login
 
-![Demo Screenshot](Web3-Login.png) 
+![Demo Screenshot](images/Web3-Login.png) 
