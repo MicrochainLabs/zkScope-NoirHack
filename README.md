@@ -54,7 +54,7 @@ On-chain behavior management within a smart account:
 ![Demo Screenshot](images/smart-account-zkp.png)
 
 
-## Integration
+## Integration and use cases
 1) The Bybit attack is an alert for missing a strong security guarantee for smart accounts that hold an important amount of value.
 Using zkScope, we will add a new security layer to the existing Safe accounts that provide strong security guarantees around the accounts' on-chain behavior(technically, via safe handler).
 In general, it will be integrated into any smart accounts: ERC-4337/ERC-7579 and EIP-7702 compliant accounts.
