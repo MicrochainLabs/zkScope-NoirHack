@@ -12,6 +12,7 @@ import { ConfirmPaymentModal } from "./confirm-payment-modal"
 import { AccountButton } from "./account-button"
 import type { Address } from "viem"
 import { useSearchParams } from "next/navigation"
+import { DAI_ADDRESS, UDSC_ADDRESS, UDST_ADDRESS } from "./constants"
 
 export default function BillPayment() {
   const [selectedBill, setSelectedBill] = useState("electricity")
@@ -36,19 +37,19 @@ export default function BillPayment() {
       name: "USDC",
       color: "bg-blue-500",
       logo: "/usd-coin-usdc-logo.png?height=24&width=24",
-      address: "0x337Df693AE75a0ff64317A77dAC8886F61455b85",
+      address: UDSC_ADDRESS,
     },
     dai: {
       name: "DAI",
       color: "bg-yellow-500",
       logo: "/multi-collateral-dai-dai-logo.png?height=24&width=24",
-      address: "0x2CA1d854C83997d56263Bf560A2D198911383b2b",
+      address: DAI_ADDRESS,
     },
     usdt: {
       name: "USDT",
       color: "bg-green-500",
       logo: "/tether-usdt-logo.png?height=24&width=24",
-      address: "0x94D869Ed79067747Be5f160a9566CC79DDc28C3E",
+      address: UDST_ADDRESS,
     },
   }
 

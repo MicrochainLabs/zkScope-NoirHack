@@ -5,6 +5,7 @@ import { pimlicoBundlerActions, pimlicoPaymasterActions } from "permissionless/a
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { AddressesIMT, SessionClaimsIMT } from "microch";
 import { zkSessionKeyArgType } from "@/libs/utils";
+import { DAI_ADDRESS, UDSC_ADDRESS, UDST_ADDRESS } from "./constants";
 
 
 
@@ -33,7 +34,7 @@ export async function openNewZKSessionWithPaymaster(accountIdentifier: string, s
 
     const sessionTree = new SessionClaimsIMT(2, 0, 2);
 
-    const sessionAllowedSmartContracts: string[] = ["0x337Df693AE75a0ff64317A77dAC8886F61455b85", "0x2CA1d854C83997d56263Bf560A2D198911383b2b", "0x94D869Ed79067747Be5f160a9566CC79DDc28C3E"] 
+    const sessionAllowedSmartContracts: string[] = [UDSC_ADDRESS, DAI_ADDRESS, UDST_ADDRESS] 
     const accountAllowedToAddressesTree: string[] = ["0xbd8faF57134f9C5584da070cC0be7CA8b5A24953", "0xb9890DC58a1A1a9264cc0E3542093Ee0A1780822", "0x45B52500cb12Ae6046D8566598aB9ccFa7B21aD7"]
 
     const sessionAllowedSmartContractTree: AddressesIMT = new AddressesIMT(17, 0, 2);
