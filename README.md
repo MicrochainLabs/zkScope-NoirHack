@@ -75,6 +75,10 @@ Session keys are scoped (i.e., restricted to certain on-chain actions), only val
 
 dApp demo: a simple application for paying bills via stablecoins. We can use ZK-based session keys for any dApp.
 
+![Demo Screenshot](images/bill-payment-app-via-Stablecoins.png) 
+
+![Demo Screenshot](images/zk-based-session-keys.png) 
+
 Set up:
 
 1) Clone the project and enter “session-keys-Demo-UI” folder
@@ -98,6 +102,6 @@ Bills payments:
 
 https://github.com/user-attachments/assets/e1b6c2d8-667a-4c2a-8e29-83215edaa23e
 
-Web1 vs. Web2 vs. Web3 Login
+Web1 vs. Web2 vs. Web3 Login:
 
 ![Demo Screenshot](images/Web3-Login.png) 
