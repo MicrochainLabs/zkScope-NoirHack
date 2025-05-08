@@ -87,6 +87,11 @@ Set up:
 
 Create new smart account:
 
+
 Create new ZK-based smart session:
-[![Video Thumbnail](https://img.youtube.com/vi/Kl0-SLvncks/0.jpg)](https://www.youtube.com/watch?v=Kl0-SLvncks)
+
+
+https://github.com/user-attachments/assets/bf649e9a-c175-4ed8-a9dc-536037cfa4fe
+
+
 Bills payments:
