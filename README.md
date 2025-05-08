@@ -88,6 +88,5 @@ Set up:
 Create new smart account:
 
 Create new ZK-based smart session:
-<video src="https://www.youtube.com/watch?v=Kl0-SLvncks" controls width="500"></video>
-
+[![Video Thumbnail](https://img.youtube.com/vi/Kl0-SLvncks/0.jpg)](https://www.youtube.com/watch?v=Kl0-SLvncks)
 Bills payments:
