@@ -9,6 +9,10 @@ At the hackathon, we're developing Noir circuits to secure, and control the on-c
 
 It enables a trust-minimized off-chain framework that secures and governs a smart account's on-chain behavior according to the user's preferences and intended actions.
 
+The idea of the project existed before the hackathon, but in a different format. During the hackathon, we built zkScope(a more long-term generalized solution).
+We also built a demo that showcases how we can use zkScope to control the on-chain behavior of a smart account at the session level to enhance the on-chain experience.
+
+
 ## 📂 Project Structure
 
 ```
