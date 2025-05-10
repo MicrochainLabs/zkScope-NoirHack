@@ -15,12 +15,16 @@ import "account-abstraction/core/Helpers.sol";
 import "account-abstraction/samples/callback/TokenCallbackHandler.sol";
 import {HonkVerifier} from "./Verifier.sol";
 import "./BytesLib.sol";
+import "./LibZip.sol";
+
 
 
 
 contract SimpleAccount is BaseAccount, TokenCallbackHandler, UUPSUpgradeable, Initializable {
 
     using BytesLib for bytes;
+    using LibZip for bytes;
+
 
     address public owner;
 
@@ -219,7 +223,7 @@ contract SimpleAccount is BaseAccount, TokenCallbackHandler, UUPSUpgradeable, In
                 address _address,
                 bytes memory _signature,
                 bytes memory _proof
-            ) = abi.decode(proof, (uint256, address, bytes, bytes));
+            ) = abi.decode(proof.flzDecompress(), (uint256, address, bytes, bytes));
             decodedProof = ZKSessionSignatureAndProof(_opProof, _address, _signature, _proof);
         }
     }

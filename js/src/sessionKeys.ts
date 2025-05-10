@@ -8,6 +8,8 @@ import { parseEther, toHex } from "viem";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { hexlify } from "ethers";
 import { LeanIMT } from "@zk-kit/lean-imt";
+import { LibZip } from 'solady'
+
 
 
 
@@ -16,6 +18,12 @@ const hash = (a: string | number | bigint, b: string | number | bigint) => posei
 
 function padArray(arr: any[], length: number, fill: any = 0) {
   return arr.concat(Array(length - arr.length).fill(fill));
+}
+
+function uint8ArrayToHex(uint8Array: Uint8Array): string {
+  return Array.from(uint8Array)
+    .map(byte => byte.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 async function  main(){
@@ -155,7 +163,11 @@ const backend = new UltraHonkBackend(circuit.bytecode);
 
 console.log("Proof Generation ...");
 const proof = await backend.generateProof(witness);
-console.log("Proof: ", proof);
+//console.log("Proof: ", proof);
+const proof1 = uint8ArrayToHex(proof.proof)
+console.log("Proof1 size: ", proof1.length);
+const proof2 = LibZip.flzCompress(proof1)
+console.log("Proof2 size: ", proof2.length);
 
 }
 

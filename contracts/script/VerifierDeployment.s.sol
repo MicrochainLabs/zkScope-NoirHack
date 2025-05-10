@@ -6,10 +6,9 @@ import "../src/Verifier.sol";
 
 //Deploy contract: forge script script/VerifierDeployment.s.sol VerifierDeployment.s --broadcast --verify --rpc-url polygon --legacy 
 /*
-##### polygon
-✅  [Success] Hash: 0xb3da6a1829cf2bcc724db26247799de03b1f81ebd97c04eab8984fea677a538d
-Contract Address: 0x97589235155FcA05e4f9dA0c4BEDbcFB9aD59912
-Block: 71091722
+✅  [Success] Hash: 0xd91666aa3df42168f7910d7c49f0cb1d626790208bc065408033ecb88f8d6b92
+Contract Address: 0xE04fE8F2136301038C77Ebed370F6141487b3B41
+Block: 71347127
 
  */
 contract VerifierDeployment is Script {
