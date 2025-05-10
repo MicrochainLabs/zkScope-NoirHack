@@ -262,7 +262,7 @@ const { witness } = await noir.execute(circuitInputs);
 const backend = new UltraHonkBackend(circuit.bytecode);
 
 console.log("Proof Generation ...");
-const proof = await backend.generateProof(witness);
+const proof = await backend.generateProof(witness, { keccak: true });
 
 
       const signature = await signUserOperationHashWithECDSA({
