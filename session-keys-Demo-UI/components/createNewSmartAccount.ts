@@ -7,6 +7,7 @@ import { polygon } from "viem/chains";
 
 
 //0xa1B50BEE65b80a82c33f0909f1D949F0ef529031
+//0xbD12EA95E493b2732Ed952B6B833E59a35Bb6fec
 export async function deployAccountAndOpenNewZKSessionWithPaymaster(signer: string, walletClient: any){
     console.log(signer)
     console.log(walletClient)
@@ -32,7 +33,7 @@ export async function deployAccountAndOpenNewZKSessionWithPaymaster(signer: stri
     }).extend(pimlicoPaymasterActions(ENTRYPOINT_ADDRESS_V07))
 
 
-    const SIMPLE_ACCOUNT_FACTORY_ADDRESS = "0x499c664380Abc361e0a783721038425E05E1D033" 
+    const SIMPLE_ACCOUNT_FACTORY_ADDRESS = "0x5E7Bd51d3CE6e9135aC31F0553816E4F7F9552C1" 
 
     const saltArray: Uint8Array = new Uint8Array(32);
     window.crypto.getRandomValues(saltArray);

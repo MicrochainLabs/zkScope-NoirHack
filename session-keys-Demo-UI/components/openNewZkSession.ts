@@ -4,8 +4,10 @@ import { polygon, polygonAmoy } from "viem/chains";
 import { pimlicoBundlerActions, pimlicoPaymasterActions } from "permissionless/actions/pimlico";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { AddressesIMT, SessionClaimsIMT } from "microch";
-import { zkSessionKeyArgType } from "@/libs/utils";
+import { hash, zkSessionKeyArgType } from "@/libs/utils";
 import { DAI_ADDRESS, UDSC_ADDRESS, UDST_ADDRESS } from "./constants";
+import { LeanIMT } from "@zk-kit/lean-imt";
+
 
 
 
@@ -34,17 +36,26 @@ export async function openNewZKSessionWithPaymaster(accountIdentifier: string, s
 
     const sessionTree = new SessionClaimsIMT(2, 0, 2);
 
+
     const sessionAllowedSmartContracts: string[] = [UDSC_ADDRESS, DAI_ADDRESS, UDST_ADDRESS] 
     const accountAllowedToAddressesTree: string[] = ["0xbd8faF57134f9C5584da070cC0be7CA8b5A24953", "0xb9890DC58a1A1a9264cc0E3542093Ee0A1780822", "0x45B52500cb12Ae6046D8566598aB9ccFa7B21aD7"]
 
-    const sessionAllowedSmartContractTree: AddressesIMT = new AddressesIMT(17, 0, 2);
+    /*const sessionAllowedSmartContractTree: AddressesIMT = new AddressesIMT(17, 0, 2);
     for (let address of sessionAllowedSmartContracts) {
         await sessionAllowedSmartContractTree.addAddress(BigInt(address));
+    }*/
+    const smartContractCallsWhitelistTree = new LeanIMT(hash)
+    for (let address of sessionAllowedSmartContracts) {
+        await smartContractCallsWhitelistTree.insert(BigInt(address));
     }
 
-    const sessionAllowedToTree: AddressesIMT = new AddressesIMT(17, 0, 2);
+    /*const sessionAllowedToTree: AddressesIMT = new AddressesIMT(17, 0, 2);
     for (let address of accountAllowedToAddressesTree) {
         await sessionAllowedToTree.addAddress(BigInt(address));
+    }*/
+    const valueTransferWhitelistTree = new LeanIMT(hash)
+    for (let address of accountAllowedToAddressesTree) {
+        await valueTransferWhitelistTree.insert(BigInt(address));
     }
 
     const sessionOwnerPrivateKey = generatePrivateKey()
@@ -52,8 +63,8 @@ export async function openNewZKSessionWithPaymaster(accountIdentifier: string, s
 
     sessionTree.addClaim(BigInt(accountIdentifier))
     sessionTree.addClaim(BigInt(sessionOwner.address))
-    sessionTree.addClaim(sessionAllowedSmartContractTree.root)
-    sessionTree.addClaim(sessionAllowedToTree.root)
+    sessionTree.addClaim(smartContractCallsWhitelistTree.root)
+    sessionTree.addClaim(valueTransferWhitelistTree.root)
 
     const addSessionCallData = encodeFunctionData({
         abi: [

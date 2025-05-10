@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx"
+import { poseidon2 } from "poseidon-lite"
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -22,3 +23,5 @@ export function loadZkSessionKeyFromLocalStorage (): zkSessionKeyArgType | null 
   const ZkSessionKeyStored = localStorage.getItem(STORAGE_ZK_SESSION_KEY)
   return ZkSessionKeyStored ? JSON.parse(ZkSessionKeyStored) : null
 }
+
+export const hash = (a: string | number | bigint, b: string | number | bigint) => poseidon2([a, b])
